@@ -515,7 +515,9 @@ async function navigate(dir) {
     if (d.status) fields['Status'] = d.status;
     fields['Notes'] = d.notes;
     if (d.photos.length > 0) {
-      fields['Photo'] = [...(d.existingPhotos||[]).map(p=>{return{url:p.url}}), ...d.photos.map(p=>{return{url:p.dataUrl,filename:p.name}})];
+      const uploaded = await Promise.all(d.photos.map(p => compressAndUpload(p.file)));
+      const existing = (d.existingPhotos||[]).map(p => ({url: p.url}));
+      fields['Photo'] = [...existing, ...uploaded.map(url => ({url}))];
     }
     const resp = await fetch(`${AIRTABLE_API}/${BASE_ID}/${encodeURIComponent(CONDITIONS_TABLE)}/${c.id}`, {
       method: 'PATCH',
