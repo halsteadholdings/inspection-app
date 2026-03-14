@@ -17,8 +17,8 @@
   .area-chip { font-size: 11px; padding: 4px 10px; border-radius: 99px; border: 1px solid #2a2a2a; background: #1a1a1a; color: #666; cursor: pointer; white-space: nowrap; }
   .area-chip.active { background: #2a1f0a; border-color: #C9922A; color: #C9922A; }
   .area-chip.done { background: #1a2a1a; border-color: #3B6D11; color: #639922; }
-  .area-badge { display: block; text-align: center; font-size: 15px; font-weight: 700; padding: 5px 14px; border-radius: 4px; margin-bottom: 0.75rem; background: #2a1f0a; color: #C9922A; letter-spacing: 0.06em; text-transform: uppercase; }
-  .condition-label { font-size: 22px; font-weight: 600; color: #f0ede8; line-height: 1.3; margin-bottom: 1.25rem; }
+  .area-badge { display: block; text-align: center; width: 100%; font-size: 16px; font-weight: 700; padding: 8px 0; margin-bottom: 0; background: #2a1f0a; color: #C9922A; letter-spacing: 0.1em; text-transform: uppercase; }
+  .condition-label { font-size: 24px; font-weight: 600; color: #f0ede8; line-height: 1.3; margin-bottom: 1.25rem; text-align: center; }
   .section-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; font-weight: 600; }
   .page-title { font-size: 18px; font-weight: 600; color: #f0ede8; margin-bottom: 0.25rem; }
   .page-subtitle { font-size: 13px; color: #666; margin-bottom: 1.5rem; }
@@ -146,7 +146,7 @@
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
     <div class="area-nav" id="area-nav"></div>
     <div class="area-badge" id="area-badge"></div>
-    <div style="height:1px;background:#2a2a2a;margin:0.75rem 0;"></div>
+    <div style="height:1px;background:#2a2a2a;margin:0.5rem 0 1rem;"></div>
     <div class="condition-label" id="condition-label"></div>
     <div class="section-label">Status</div>
     <div class="status-grid">
@@ -403,7 +403,7 @@ function jumpToArea(area) {
 function renderCondition() {
   const c = conditions[currentIndex], f = c.fields, d = localData[c.id];
   document.getElementById('area-badge').textContent = f.Area || '';
-  document.getElementById('condition-label').textContent = (f.Order || (currentIndex+1)) + '. ' + (f.Component || '');
+  document.getElementById('condition-label').textContent = f.Component || '';
   document.getElementById('insp-counter').textContent = (currentIndex+1) + ' / ' + conditions.length;
   document.getElementById('progress-fill').style.width = (currentIndex / conditions.length * 100) + '%';
   document.getElementById('notes-field').value = d.notes;
