@@ -156,6 +156,21 @@
       <button class="status-btn" data-val="Replace" onclick="setStatus(this)">Replace</button>
       <button class="status-btn" data-val="N/A" onclick="setStatus(this)" style="grid-column:1/-1;">N/A</button>
     </div>
+    <div id="drain-side-block" style="display:none;">
+      <div class="section-label">Tub drain side</div>
+      <div class="option-grid">
+        <button class="option-btn" data-val="Left" onclick="setDrainSide(this)">Left</button>
+        <button class="option-btn" data-val="Right" onclick="setDrainSide(this)">Right</button>
+      </div>
+    </div>
+    <div id="count-block" style="display:none;">
+      <div class="section-label">Outlet count (unit total)</div>
+      <input type="number" id="outlet-count" placeholder="e.g. 24" min="0" onchange="selections.outletCount = this.value" />
+      <div class="section-label">Switch count (unit total)</div>
+      <input type="number" id="switch-count" placeholder="e.g. 12" min="0" onchange="selections.switchCount = this.value" />
+      <div class="section-label">Plate count (unit total)</div>
+      <input type="number" id="plate-count" placeholder="e.g. 36" min="0" onchange="selections.plateCount = this.value" />
+    </div>
     <div class="section-label">Notes</div>
     <textarea id="notes-field" placeholder="Add notes about this item..."></textarea>
     <div class="section-label">Photos</div>
@@ -184,6 +199,9 @@
       <button class="option-btn" onclick="selectOption('turnLevel', 'Medium', this)">Medium</button>
       <button class="option-btn full" onclick="selectOption('turnLevel', 'Heavy', this)">Heavy</button>
     </div>
+
+    <div class="section-label">Window inventory (all windows, W×H in inches)</div>
+    <textarea id="window-inventory" placeholder="e.g. LR: 36x60, 36x60 | BR1: 30x48 | BR2: 30x48 | Bath: 24x36"></textarea>
 
     <div class="section-label">Overall notes</div>
     <textarea id="summary-notes" placeholder="Any overall notes about this unit..."></textarea>
@@ -435,10 +453,40 @@ function jumpToArea(area) {
   if (idx >= 0) { currentIndex = idx; renderCondition(); }
 }
 
+function setDrainSide(btn) {
+  const val = btn.dataset.val;
+  const area = conditions[currentIndex].fields.Area;
+  if (!selections.drainSides) selections.drainSides = {};
+  selections.drainSides[area] = val;
+  btn.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
 function renderCondition() {
   const c = conditions[currentIndex], f = c.fields, d = localData[c.id];
   document.getElementById('area-badge').textContent = f.Area || '';
   document.getElementById('condition-label').textContent = f.Component || '';
+
+  const drainBlock = document.getElementById('drain-side-block');
+  if (f.Component === 'Shower/Tub') {
+    drainBlock.style.display = 'block';
+    const saved = (selections.drainSides || {})[f.Area];
+    drainBlock.querySelectorAll('.option-btn').forEach(b => {
+      b.classList.toggle('selected', b.dataset.val === saved);
+    });
+  } else {
+    drainBlock.style.display = 'none';
+  }
+
+  const countBlock = document.getElementById('count-block');
+  if (f.Component === 'Electrical Outlets') {
+    countBlock.style.display = 'block';
+    document.getElementById('outlet-count').value = selections.outletCount || '';
+    document.getElementById('switch-count').value = selections.switchCount || '';
+    document.getElementById('plate-count').value = selections.plateCount || '';
+  } else {
+    countBlock.style.display = 'none';
+  }
   document.getElementById('insp-counter').textContent = (currentIndex+1) + ' / ' + conditions.length;
   document.getElementById('progress-fill').style.width = (currentIndex / conditions.length * 100) + '%';
   document.getElementById('notes-field').value = d.notes;
@@ -576,6 +624,16 @@ async function submitSummary() {
     fields['Inspection Status'] = 'Completed';
     const notes = document.getElementById('summary-notes').value.trim();
     if (notes) fields['Notes'] = notes;
+    const windowInv = document.getElementById('window-inventory').value.trim();
+    if (windowInv) fields['Window Inventory'] = windowInv;
+    if (selections.outletCount) fields['Outlet Count'] = Number(selections.outletCount);
+    if (selections.switchCount) fields['Switch Count'] = Number(selections.switchCount);
+    if (selections.plateCount) fields['Plate Count'] = Number(selections.plateCount);
+    if (selections.drainSides) {
+      const drainStr = Object.keys(selections.drainSides).sort()
+        .map(area => `${area}: ${selections.drainSides[area]}`).join(' / ');
+      fields['Tub Drain Sides'] = drainStr;
+    }
     if (summaryPhotos.length > 0) {
       const uploaded = await Promise.all(summaryPhotos.map(p => compressAndUpload(p.file)));
       fields['Photo Folder'] = uploaded.map(url => ({url}));
@@ -612,6 +670,9 @@ function resetApp() {
   document.getElementById('photo-preview').innerHTML='';
   document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
   selections.bedrooms = null; selections.bathrooms = null; selections.basement = null;
+  selections.outletCount = null; selections.switchCount = null; selections.plateCount = null;
+  selections.drainSides = null;
+  document.getElementById('window-inventory').value='';
   document.getElementById('insp-counter').style.display='none';
   document.getElementById('setup-error').textContent='';
   showScreen('screen-setup');
