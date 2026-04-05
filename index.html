@@ -221,7 +221,7 @@
     <div class="section-label">Turn level</div>
     <div class="option-grid">
       <button class="option-btn" onclick="selectOption('turnLevel', 'Light', this)">Light</button>
-      <button class="option-btn" onclick="selectOption('turnLevel', 'Medium', this)">Medium</button>
+      <button class="option-btn" onclick="selectOption('turnLevel', 'Standard', this)">Standard</button>
       <button class="option-btn full" onclick="selectOption('turnLevel', 'Heavy', this)">Heavy</button>
     </div>
 
@@ -402,7 +402,7 @@ function buildConditionTemplate(bedrooms, bathrooms, basement) {
   // Living Room
   for (const c of ['Walls','Floors','Ceiling','Windows','Blinds','Lights']) add('Living Room', c);
   // Kitchen
-  for (const c of ['Cabinets','Counters','Sink','Refrigerator','Oven','Dishwasher','Walls','Floors','Ceiling']) add('Kitchen', c);
+  for (const c of ['Cabinets','Counters','Backsplash','Sink','Refrigerator','Oven','Dishwasher','Walls','Floors','Ceiling']) add('Kitchen', c);
   // Hallways/Stairs
   for (const c of ['Walls','Floors','Ceiling','Lights']) add('Hallways/Stairs', c);
   // Bedrooms
