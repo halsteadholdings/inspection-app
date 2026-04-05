@@ -156,6 +156,31 @@
       <button class="status-btn" data-val="Replace" onclick="setStatus(this)">Replace</button>
       <button class="status-btn" data-val="N/A" onclick="setStatus(this)" style="grid-column:1/-1;">N/A</button>
     </div>
+    <div id="oven-block" style="display:none;">
+      <div class="section-label">Oven fuel</div>
+      <div class="option-grid">
+        <button class="option-btn" data-val="Gas" onclick="setOvenFuel(this)">Gas</button>
+        <button class="option-btn" data-val="Electric" onclick="setOvenFuel(this)">Electric</button>
+      </div>
+      <div class="section-label">Oven model #</div>
+      <input type="text" id="oven-model" placeholder="e.g. FCRG3052AS" onchange="selections.ovenModel = this.value" />
+    </div>
+    <div id="fridge-block" style="display:none;">
+      <div class="section-label">Refrigerator model #</div>
+      <input type="text" id="fridge-model" placeholder="e.g. FRT18S6JW" onchange="selections.fridgeModel = this.value" />
+    </div>
+    <div id="wh-block" style="display:none;">
+      <div class="section-label">Water heater — year installed</div>
+      <input type="number" id="wh-year" placeholder="e.g. 2018" min="1950" max="2099" onchange="selections.whYear = this.value" />
+      <div class="section-label">Capacity (gallons)</div>
+      <input type="number" id="wh-gal" placeholder="e.g. 40" min="0" onchange="selections.whGal = this.value" />
+    </div>
+    <div id="furnace-block" style="display:none;">
+      <div class="section-label">Furnace — year installed</div>
+      <input type="number" id="furnace-year" placeholder="e.g. 2015" min="1950" max="2099" onchange="selections.furnaceYear = this.value" />
+      <div class="section-label">Filter size</div>
+      <input type="text" id="furnace-filter" placeholder="e.g. 16x25x1" onchange="selections.furnaceFilter = this.value" />
+    </div>
     <div id="drain-side-block" style="display:none;">
       <div class="section-label">Tub drain side</div>
       <div class="option-grid">
@@ -453,6 +478,12 @@ function jumpToArea(area) {
   if (idx >= 0) { currentIndex = idx; renderCondition(); }
 }
 
+function setOvenFuel(btn) {
+  selections.ovenFuel = btn.dataset.val;
+  btn.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
 function setDrainSide(btn) {
   const val = btn.dataset.val;
   const area = conditions[currentIndex].fields.Area;
@@ -476,6 +507,43 @@ function renderCondition() {
     });
   } else {
     drainBlock.style.display = 'none';
+  }
+
+  const ovenBlock = document.getElementById('oven-block');
+  if (f.Component === 'Oven') {
+    ovenBlock.style.display = 'block';
+    document.getElementById('oven-model').value = selections.ovenModel || '';
+    ovenBlock.querySelectorAll('.option-btn').forEach(b => {
+      b.classList.toggle('selected', b.dataset.val === selections.ovenFuel);
+    });
+  } else {
+    ovenBlock.style.display = 'none';
+  }
+
+  const fridgeBlock = document.getElementById('fridge-block');
+  if (f.Component === 'Refrigerator') {
+    fridgeBlock.style.display = 'block';
+    document.getElementById('fridge-model').value = selections.fridgeModel || '';
+  } else {
+    fridgeBlock.style.display = 'none';
+  }
+
+  const whBlock = document.getElementById('wh-block');
+  if (f.Component === 'Water Heater') {
+    whBlock.style.display = 'block';
+    document.getElementById('wh-year').value = selections.whYear || '';
+    document.getElementById('wh-gal').value = selections.whGal || '';
+  } else {
+    whBlock.style.display = 'none';
+  }
+
+  const furnaceBlock = document.getElementById('furnace-block');
+  if (f.Component === 'Furnace/HVAC') {
+    furnaceBlock.style.display = 'block';
+    document.getElementById('furnace-year').value = selections.furnaceYear || '';
+    document.getElementById('furnace-filter').value = selections.furnaceFilter || '';
+  } else {
+    furnaceBlock.style.display = 'none';
   }
 
   const countBlock = document.getElementById('count-block');
@@ -629,6 +697,13 @@ async function submitSummary() {
     if (selections.outletCount) fields['Outlet Count'] = Number(selections.outletCount);
     if (selections.switchCount) fields['Switch Count'] = Number(selections.switchCount);
     if (selections.plateCount) fields['Plate Count'] = Number(selections.plateCount);
+    if (selections.ovenFuel) fields['Oven Fuel'] = selections.ovenFuel;
+    if (selections.ovenModel) fields['Oven Model'] = selections.ovenModel;
+    if (selections.fridgeModel) fields['Fridge Model'] = selections.fridgeModel;
+    if (selections.whYear) fields['Water Heater Year'] = Number(selections.whYear);
+    if (selections.whGal) fields['Water Heater Capacity'] = Number(selections.whGal);
+    if (selections.furnaceYear) fields['Furnace Year'] = Number(selections.furnaceYear);
+    if (selections.furnaceFilter) fields['Furnace Filter Size'] = selections.furnaceFilter;
     if (selections.drainSides) {
       const drainStr = Object.keys(selections.drainSides).sort()
         .map(area => `${area}: ${selections.drainSides[area]}`).join(' / ');
@@ -672,6 +747,9 @@ function resetApp() {
   selections.bedrooms = null; selections.bathrooms = null; selections.basement = null;
   selections.outletCount = null; selections.switchCount = null; selections.plateCount = null;
   selections.drainSides = null;
+  selections.ovenFuel = null; selections.ovenModel = null; selections.fridgeModel = null;
+  selections.whYear = null; selections.whGal = null;
+  selections.furnaceYear = null; selections.furnaceFilter = null;
   document.getElementById('window-inventory').value='';
   document.getElementById('insp-counter').style.display='none';
   document.getElementById('setup-error').textContent='';
