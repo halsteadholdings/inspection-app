@@ -410,7 +410,7 @@ function buildConditionTemplate(bedrooms, bathrooms, basement) {
     for (const c of ['Walls','Floors','Ceiling','Windows','Blinds','Closet']) add(`Bedroom ${b}`, c);
   // Bathrooms
   for (let b = 1; b <= bathrooms; b++)
-    for (const c of ['Sink','Toilet','Shower/Tub','Floors','Walls','Ceiling','Cabinets','Lights']) add(`Bathroom ${b}`, c);
+    for (const c of ['Sink','Toilet','Shower/Tub','Shower/Tub Tiles','Floors','Walls','Ceiling','Cabinets','Lights']) add(`Bathroom ${b}`, c);
   // Basement
   if (basement === 'Yes')
     for (const c of ['Walls','Floors','Ceiling','Lights','Windows']) add('Basement', c);
