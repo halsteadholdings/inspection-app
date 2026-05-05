@@ -462,7 +462,7 @@ async function createConditions(inspNum) {
   conditions = createdRecords.sort((a, b) => (a.fields.Order || 0) - (b.fields.Order || 0));
   localData = {};
   conditions.forEach(c => {
-    localData[c.id] = { status: c.fields.Status || '', notes: c.fields.Notes || '', photos: [], existingPhotos: c.fields.Photo || [] };
+    localData[c.id] = { status: c.fields.Status || 'N/A', notes: c.fields.Notes || '', photos: [], existingPhotos: c.fields.Photo || [] };
   });
   buildAreaNav();
   document.getElementById('insp-counter').style.display = 'block';
